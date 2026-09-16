@@ -13,7 +13,7 @@ Edit this file first. Most of the time it is the only file you need to touch.
 #  1 · MODEL
 # ══════════════════════════════════════════════════════════════
 
-MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
+MODEL_NAME = "Qwen/Qwen2.5-1.5B-Instruct"
 
 # Other models that fit on a Colab T4 or a decent laptop:
 #   "Qwen/Qwen2.5-1.5B-Instruct"            better quality, needs a GPU
@@ -37,21 +37,23 @@ USE_API = False                            # True = call a hosted model
 #  3 · GENERATION SETTINGS
 # ══════════════════════════════════════════════════════════════
 
-TEMPERATURE        = 0.7     # 0 = same answer every time · 1 = varied
-TOP_P              = 0.9     # keep the most likely tokens
-MAX_NEW_TOKENS     = 200     # cap on the ANSWER length
-DO_SAMPLE          = True    # ⚠️ False makes TEMPERATURE do nothing
-REPETITION_PENALTY = 1.1     # stops it looping
+
+TEMPERATURE = 0.7
+
+TOP_P = 0.9
+
+MAX_NEW_TOKENS = 32,768
+
+DO_SAMPLE = True
+
+REPETITION_PENALTY = 1.1
 
 
 # ══════════════════════════════════════════════════════════════
 #  4 · MEMORY
 # ══════════════════════════════════════════════════════════════
 
-MAX_TURNS   = 6                # how many past turns to send with each request
-MEMORY_FILE = "memory.json"    # where the conversation is saved
-
-
+MAX_TURNS = 6
 # ══════════════════════════════════════════════════════════════
 #  5 · INTERFACE
 # ══════════════════════════════════════════════════════════════
@@ -72,7 +74,7 @@ EXAMPLES = [
 #  6 · LIMITS
 # ══════════════════════════════════════════════════════════════
 
-MAX_INPUT_CHARS = 2000        # reject anything longer
+MAX_INPUT_CHARS = 1000    # reject anything longer
 
 
 if __name__ == "__main__":
@@ -80,4 +82,4 @@ if __name__ == "__main__":
     print(f"temperature : {TEMPERATURE}")
     print(f"do_sample   : {DO_SAMPLE}")
     print(f"max tokens  : {MAX_NEW_TOKENS}")
-    print(f"memory      : last {MAX_TURNS} turns → {MEMORY_FILE}")
+
