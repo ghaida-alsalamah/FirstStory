@@ -775,6 +775,10 @@ function bind(){
         const story=
           await response.json();
 
+        console.log("API STORY:", story);
+        console.log("TITLE:", story?.title);
+        console.log("PAGES:", story?.pages);
+
         if(
           !story ||
           typeof story.title!=='string' ||

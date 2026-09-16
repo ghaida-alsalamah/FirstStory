@@ -1,4 +1,5 @@
 import json
+from unittest import result
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,7 +16,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "http://127.0.0.1:5173"
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -51,6 +54,19 @@ def generate_story(data: StoryRequest):
         f"{result['output_tokens']} out"
     )
 
-    story = json.loads(result["reply"])
+    print("\nMODEL REPLY:")
+    print(repr(result["reply"]), flush=True)
+
+    reply = result["reply"].strip()
+
+    start = reply.find("{")
+    end = reply.rfind("}")
+
+    if start == -1 or end == -1:
+        raise ValueError("Model did not return a JSON object")
+
+    reply = reply[start:end + 1]
+
+    story = json.loads(reply)
 
     return story
