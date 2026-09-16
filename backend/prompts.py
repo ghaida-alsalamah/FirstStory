@@ -10,7 +10,6 @@ Child information:
 - New experience: {experience}
 - Concern or fear: {concern}
 - Interest: {interest}
-- Story language: {language}
 
 Rules:
 - Use simple, age-appropriate language for a {age}-year-old child.
@@ -24,7 +23,6 @@ Rules:
 - End with confidence and familiarity.
 - Write exactly 6 story pages.
 - Each page should contain 1-3 short sentences.
-- Write in {language}.
 
 Return ONLY valid JSON in this exact format:
 
@@ -47,8 +45,7 @@ def build_story_prompt(
     age,
     experience,
     concern,
-    interest,
-    language
+    interest
 ):
     return SYSTEM_PROMPT.format(
         name=name,
@@ -56,7 +53,6 @@ def build_story_prompt(
         experience=experience,
         concern=concern or "Not specified",
         interest=interest or "Not specified",
-        language=language
     )
 
 
@@ -66,8 +62,7 @@ if __name__ == "__main__":
         age=6,
         experience="First airplane flight",
         concern="Loud noises",
-        interest="Space and planets",
-        language="English"
+        interest="Space and planets"
     )
 
     print(f"\n--- SYSTEM_PROMPT ({len(text)} chars) ---")

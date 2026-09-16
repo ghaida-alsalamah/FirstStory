@@ -32,7 +32,7 @@ class StoryRequest(BaseModel):
     experience: str
     concern: str = ""
     interest: str = ""
-    language: str
+    
 
 
 @app.post("/generate")
@@ -43,8 +43,7 @@ def generate_story(data: StoryRequest):
         age=data.age,
         experience=data.experience,
         concern=data.concern,
-        interest=data.interest,
-        language=data.language
+        interest=data.interest
     )
 
     result = llm.generate(user_prompt)
@@ -67,6 +66,6 @@ def generate_story(data: StoryRequest):
 
     reply = reply[start:end + 1]
 
-    story = json.loads(reply)
+    story = json.loads(reply)                      
 
     return story
