@@ -1,13 +1,3 @@
-"""
-llm.py — everything that talks to the model.
-
-This is the ONLY file that knows a model exists. Nothing else in the project
-imports torch or transformers.
-
-Why? Because if you later switch from a local model to an API, you rewrite
-this file and nothing else. That is the point of keeping it separate.
-"""
-
 import re
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -53,19 +43,15 @@ def load_model():
 #  The one function the rest of the app calls
 # ══════════════════════════════════════════════════════════════
 
-def ask(messages: list) -> dict:
-    """
-    Send a list of messages, get a reply.
-
-    messages looks like:
-        [{"role": "system",    "content": "..."},
-         {"role": "user",      "content": "..."},
-         {"role": "assistant", "content": "..."},
-         {"role": "user",      "content": "..."}]
-
-    Returns a dict with the reply and some numbers about it.
-    """
+def generate(prompt: str):
     tok, model = load_model()
+
+    messages = [
+        {
+            "role": "user",
+            "content": prompt
+        }
+    ]
 
     # ── 1 · the chat template turns the list into one string ────
     text = tok.apply_chat_template(
@@ -125,9 +111,9 @@ def clean(text: str) -> str:
 
 
 if __name__ == "__main__":
-    out = ask([
-        {"role": "system", "content": "You are a helpful assistant. One sentence."},
-        {"role": "user", "content": "What is a token?"},
-    ])
+    prompt = "Write one short sentence about a child's first airplane flight."
+
+    out = generate(prompt)
+
     print(out["reply"])
     print(f"\n{out['input_tokens']} in · {out['output_tokens']} out")
