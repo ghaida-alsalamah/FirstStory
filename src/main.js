@@ -1,74 +1,94 @@
-import './style.css';
+import "./style.css";
 
-const experiences=[
- {id:'school',color:'#EF453D',title:'First day at school',ar:'أول يوم في المدرسة',kind:'school'},
- {id:'flight',color:'#FFD336',title:'First airplane flight',ar:'أول رحلة بالطائرة',kind:'plane'},
- {id:'dentist',color:'#63B84D',title:'Dentist visit',ar:'زيارة طبيب الأسنان',kind:'tooth'},
- {id:'haircut',color:'#EF453D',title:'First haircut',ar:'قصة الشعر الأولى',kind:'scissors'},
- {id:'home',color:'#FFD336',title:'Moving to a new home',ar:'الانتقال إلى منزل جديد',kind:'home'},
- {id:'pet',color:'#63B84D',title:'Getting a new pet',ar:'حيوان أليف جديد',kind:'pet'},
- {id:'baby',color:'#EF453D',title:'New baby sibling',ar:'مولود جديد في العائلة',kind:'baby'},
- {id:'sleepover',color:'#FFD336',title:'First night away',ar:'أول ليلة بعيداً عن المنزل',kind:'moon'},
- {id:'other',color:'#63B84D',title:'Something else',ar:'تجربة أخرى',kind:'star'}
+const experiences = [
+  {
+    id: "school",
+    color: "#EF453D",
+    title: "First day at school",
+    kind: "school",
+  },
+  {
+    id: "flight",
+    color: "#FFD336",
+    title: "First airplane flight",
+    kind: "plane",
+  },
+  { id: "dentist", color: "#63B84D", title: "Dentist visit", kind: "tooth" },
+  { id: "haircut", color: "#EF453D", title: "First haircut", kind: "scissors" },
+  { id: "home", color: "#FFD336", title: "Moving to a new home", kind: "home" },
+  { id: "pet", color: "#63B84D", title: "Getting a new pet", kind: "pet" },
+  { id: "baby", color: "#EF453D", title: "New baby sibling", kind: "baby" },
+  {
+    id: "sleepover",
+    color: "#FFD336",
+    title: "First night away",
+    kind: "moon",
+  },
+  { id: "other", color: "#63B84D", title: "Something else", kind: "star" },
 ];
 
-const state={
-  step:1,
-  experience:'flight',
-  customExperience:'',
-  language:'English',
-  name:'',
-  age:'6',
-  concern:'',
-  interest:'',
-  page:0,
-  paused:false,
-  loading:false,
-  story:null
+const state = {
+  step: 1,
+  experience: "flight",
+  customExperience: "",
+  name: "",
+  age: "6",
+  concern: "",
+  interest: "",
+  page: 0,
+  paused: false,
+  loading: false,
+  story: null,
 };
 
-const API_URL='http://127.0.0.1:8000/generate';
+const API_URL = "/api/generate";
 
-const app=document.querySelector('#app');
+const app = document.querySelector("#app");
 
-const esc=(v='')=>String(v).replace(
-  /[&<>"']/g,
-  x=>({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#039;'
-  }[x])
-);
+const esc = (v = "") =>
+  String(v).replace(
+    /[&<>"']/g,
+    (x) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      })[x],
+  );
 
-const art={
- school:'<path fill="#FFD336" stroke="#173A65" stroke-width="5" d="M19 42 50 18l31 24v39H19z"/><path fill="#EF453D" d="M13 40h74L50 12z"/><path fill="#FFF8E7" stroke="#173A65" stroke-width="4" d="M40 53h20v28H40z"/><circle fill="#2389ED" cx="29" cy="58" r="7"/><circle fill="#2389ED" cx="71" cy="58" r="7"/>',
+const art = {
+  school:
+    '<path fill="#FFD336" stroke="#173A65" stroke-width="5" d="M19 42 50 18l31 24v39H19z"/><path fill="#EF453D" d="M13 40h74L50 12z"/><path fill="#FFF8E7" stroke="#173A65" stroke-width="4" d="M40 53h20v28H40z"/><circle fill="#2389ED" cx="29" cy="58" r="7"/><circle fill="#2389ED" cx="71" cy="58" r="7"/>',
 
- plane:'<path fill="#FFF8E7" stroke="#173A65" stroke-width="5" d="M11 53c0-7 8-10 17-9l18 2 20-28c4-6 12-3 10 5L67 48l17 3c10 2 10 12 0 14l-17 3 9 16c2 7-6 10-10 5L46 70l-18 2c-10 1-17-3-17-10z"/><path fill="#EF453D" d="m73 51 15 3c7 2 7 7 0 9l-15 2z"/><circle fill="#2389ED" cx="53" cy="56" r="4"/><circle fill="#2389ED" cx="63" cy="58" r="4"/>',
+  plane:
+    '<path fill="#FFF8E7" stroke="#173A65" stroke-width="5" d="M11 53c0-7 8-10 17-9l18 2 20-28c4-6 12-3 10 5L67 48l17 3c10 2 10 12 0 14l-17 3 9 16c2 7-6 10-10 5L46 70l-18 2c-10 1-17-3-17-10z"/><path fill="#EF453D" d="m73 51 15 3c7 2 7 7 0 9l-15 2z"/><circle fill="#2389ED" cx="53" cy="56" r="4"/><circle fill="#2389ED" cx="63" cy="58" r="4"/>',
 
- tooth:'<path fill="#FFF8E7" stroke="#173A65" stroke-width="5" d="M22 22c12-10 21 0 28 0s16-10 28 0c16 13 3 35-2 50-5 14-14 19-19 2l-4-17c-1-5-5-5-6 0l-4 17c-5 17-14 12-19-2-5-15-18-37-2-50z"/><path fill="none" stroke="#2389ED" stroke-width="4" d="M37 37c6 6 20 6 26 0"/>',
+  tooth:
+    '<path fill="#FFF8E7" stroke="#173A65" stroke-width="5" d="M22 22c12-10 21 0 28 0s16-10 28 0c16 13 3 35-2 50-5 14-14 19-19 2l-4-17c-1-5-5-5-6 0l-4 17c-5 17-14 12-19-2-5-15-18-37-2-50z"/><path fill="none" stroke="#2389ED" stroke-width="4" d="M37 37c6 6 20 6 26 0"/>',
 
- scissors:'<circle fill="#EF453D" stroke="#173A65" stroke-width="5" cx="26" cy="72" r="15"/><circle fill="#FFD336" stroke="#173A65" stroke-width="5" cx="74" cy="72" r="15"/><path fill="#FFF8E7" stroke="#173A65" stroke-width="5" d="m36 61 37-46c4-5 9 0 6 5L60 53l-9 12zM64 61 27 15c-4-5-9 0-6 5l19 33 9 12z"/>',
+  scissors:
+    '<circle fill="#EF453D" stroke="#173A65" stroke-width="5" cx="26" cy="72" r="15"/><circle fill="#FFD336" stroke="#173A65" stroke-width="5" cx="74" cy="72" r="15"/><path fill="#FFF8E7" stroke="#173A65" stroke-width="5" d="m36 61 37-46c4-5 9 0 6 5L60 53l-9 12zM64 61 27 15c-4-5-9 0-6 5l19 33 9 12z"/>',
 
- home:'<path fill="#FFF8E7" stroke="#173A65" stroke-width="5" d="M18 45 50 18l32 27v39H18z"/><path fill="#EF453D" stroke="#173A65" stroke-width="5" d="M10 48 50 13l40 35-8 8-32-27-32 27z"/><path fill="#FFD336" stroke="#173A65" stroke-width="4" d="M42 57h17v27H42z"/>',
+  home: '<path fill="#FFF8E7" stroke="#173A65" stroke-width="5" d="M18 45 50 18l32 27v39H18z"/><path fill="#EF453D" stroke="#173A65" stroke-width="5" d="M10 48 50 13l40 35-8 8-32-27-32 27z"/><path fill="#FFD336" stroke="#173A65" stroke-width="4" d="M42 57h17v27H42z"/>',
 
- pet:'<path fill="#FFD336" stroke="#173A65" stroke-width="5" d="M24 32 13 13c18-2 24 9 25 15 8-4 16-4 24 0 1-6 7-17 25-15L76 32c8 8 10 19 7 32-5 20-61 20-66 0-3-13-1-24 7-32z"/><circle cx="37" cy="49" r="5" fill="#173A65"/><circle cx="65" cy="49" r="5" fill="#173A65"/><path fill="#EF453D" d="M45 62q6-7 12 0-6 9-12 0"/>',
+  pet: '<path fill="#FFD336" stroke="#173A65" stroke-width="5" d="M24 32 13 13c18-2 24 9 25 15 8-4 16-4 24 0 1-6 7-17 25-15L76 32c8 8 10 19 7 32-5 20-61 20-66 0-3-13-1-24 7-32z"/><circle cx="37" cy="49" r="5" fill="#173A65"/><circle cx="65" cy="49" r="5" fill="#173A65"/><path fill="#EF453D" d="M45 62q6-7 12 0-6 9-12 0"/>',
 
- baby:'<circle fill="#FFF8E7" stroke="#173A65" stroke-width="5" cx="50" cy="54" r="31"/><path fill="#FFD336" stroke="#173A65" stroke-width="4" d="M40 26c-2-13 16-17 20-4 2 8-8 11-14 7"/><circle fill="#173A65" cx="38" cy="51" r="4"/><circle fill="#173A65" cx="62" cy="51" r="4"/><path fill="none" stroke="#EF453D" stroke-width="4" d="M42 65q8 7 16 0"/>',
+  baby: '<circle fill="#FFF8E7" stroke="#173A65" stroke-width="5" cx="50" cy="54" r="31"/><path fill="#FFD336" stroke="#173A65" stroke-width="4" d="M40 26c-2-13 16-17 20-4 2 8-8 11-14 7"/><circle fill="#173A65" cx="38" cy="51" r="4"/><circle fill="#173A65" cx="62" cy="51" r="4"/><path fill="none" stroke="#EF453D" stroke-width="4" d="M42 65q8 7 16 0"/>',
 
- moon:'<path fill="#FFD336" stroke="#173A65" stroke-width="5" d="M70 78A36 36 0 1 1 50 12c-17 22-8 54 20 66z"/><path fill="#FFF8E7" d="m72 17 3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/>',
+  moon: '<path fill="#FFD336" stroke="#173A65" stroke-width="5" d="M70 78A36 36 0 1 1 50 12c-17 22-8 54 20 66z"/><path fill="#FFF8E7" d="m72 17 3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/>',
 
- star:'<path fill="#FFD336" stroke="#173A65" stroke-width="5" stroke-linejoin="round" d="m50 10 11 25 27 3-20 18 6 27-24-14-24 14 6-27-20-18 27-3z"/>'
+  star: '<path fill="#FFD336" stroke="#173A65" stroke-width="5" stroke-linejoin="round" d="m50 10 11 25 27 3-20 18 6 27-24-14-24 14 6-27-20-18 27-3z"/>',
 };
 
-const icon=(kind,cls='')=>`
+const icon = (kind, cls = "") => `
 <svg class="toy-icon ${cls}" viewBox="0 0 100 100" aria-hidden="true">
   ${art[kind]}
 </svg>
 `;
 
-function clouds(extra=''){
+function clouds(extra = "") {
   return `
   <div class="sky-decor ${extra}" aria-hidden="true">
     <div class="cloud cloud-a"><i></i><i></i><i></i></div>
@@ -80,11 +100,11 @@ function clouds(extra=''){
   </div>`;
 }
 
-function topbar(){
+function topbar() {
   return `
   <header class="topbar">
     <button class="mini-brand" data-go="1">
-      ★ <span>My First Story</span>
+      ★ <span>First Story</span>
     </button>
 
     <button
@@ -92,47 +112,59 @@ function topbar(){
       class="motion-toggle"
       aria-pressed="${state.paused}"
     >
-      ${state.paused?'▶ Play':'Ⅱ Pause'} animation
+      ${state.paused ? "▶ Play" : "Ⅱ Pause"} animation
     </button>
   </header>`;
 }
 
-function progress(){
+function progress() {
   return `
   <div class="progress">
-    ${['Start','Choose','Make it yours','Read']
-      .map((x,i)=>`
-        <span class="${state.step===i+1?'on':''} ${state.step>i+1?'done':''}">
-          <b>${state.step>i+1?'✓':i+1}</b>
+    ${["Start", "Choose", "Make it yours", "Read"]
+      .map(
+        (x, i) => `
+        <span class="${state.step === i + 1 ? "on" : ""} ${state.step > i + 1 ? "done" : ""}">
+          <b>${state.step > i + 1 ? "✓" : i + 1}</b>
           <small>${x}</small>
         </span>
-      `)
-      .join('')}
+      `,
+      )
+      .join("")}
   </div>`;
 }
 
-function bookSvg(){
+function bookSvg() {
   return `
   <div class="magic-book" aria-hidden="true">
     <div class="book-shadow"></div>
-    <div class="book-back"></div>
-
-    <div class="pages">
-      <div class="page page-3"></div>
-      <div class="page page-2"></div>
-      <div class="page page-1"><span>★</span></div>
-    </div>
-
-    <div class="book-cover">
-      <div class="cover-frame">
-        <b>★</b>
-        <i>Once upon<br>a time…</i>
+    <div class="book-base"></div>
+    <div class="open-pages">
+      <div class="landing-page left-page">
+        <span class="page-corner-star">★</span>
+        <div class="storybook-sky">
+          <i class="storybook-moon"></i>
+          <i class="storybook-cloud cloud-one"></i>
+          <i class="storybook-cloud cloud-two"></i>
+          <i class="storybook-hill hill-one"></i>
+          <i class="storybook-hill hill-two"></i>
+          <span class="storybook-house"><b></b><i></i></span>
+        </div>
+      </div>
+      <div class="landing-page right-page">
+        <span class="story-lines"><i></i><i></i><i></i></span>
+        <strong>Every big adventure<br>begins with a story.</strong>
+        <span class="tiny-sparkles">★ <i>•</i> ★</span>
       </div>
     </div>
+    <div class="book-spine"></div>
+    <div class="turning-page"><span>★</span></div>
+    <span class="book-spark spark-one">★</span>
+    <span class="book-spark spark-two">★</span>
+    <span class="book-spark spark-three">•</span>
   </div>`;
 }
 
-function rocket(){
+function rocket() {
   return `
   <div class="rocket-orbit" aria-hidden="true">
     <svg class="rocket" viewBox="0 0 90 120">
@@ -165,21 +197,16 @@ function rocket(){
   </div>`;
 }
 
-function landing(){
+function landing() {
   return `
   <main class="toy-world landing">
     ${clouds()}
     ${topbar()}
 
-    <button class="lang-bubble" id="languageToggle">
-      ${state.language==='English'?'عربي':'English'}
-    </button>
-
     <section class="landing-scene">
 
       <h1 class="big-title">
-        <span class="ar-title">قصتي الأولى</span>
-        <span class="en-title">My First Story</span>
+        <span class="en-title">First Story</span>
       </h1>
 
       <div class="book-stage">
@@ -187,13 +214,11 @@ function landing(){
         ${rocket()}
         <div class="block block-a">A</div>
         <div class="block block-b">★</div>
-        <div class="block block-c">ب</div>
+        <div class="block block-c">S</div>
       </div>
 
       <button class="start-btn" data-go="2">
-        <span>
-          ${state.language==='Arabic'?'اصنع قصتك':'Make your story'}
-        </span>
+        <span>Make your story</span>
 
         <svg viewBox="0 0 70 50">
           <path
@@ -211,11 +236,11 @@ function landing(){
   </main>`;
 }
 
-function choose(){
+function choose() {
   return `
   <main class="toy-world flow-world">
 
-    ${clouds('soft')}
+    ${clouds("soft")}
     ${topbar()}
 
     <section class="panel-wrap">
@@ -229,9 +254,11 @@ function choose(){
       </div>
 
       <div class="toy-grid">
-        ${experiences.map(e=>`
+        ${experiences
+          .map(
+            (e) => `
           <button
-            class="toy-card ${state.experience===e.id?'selected':''}"
+            class="toy-card ${state.experience === e.id ? "selected" : ""}"
             data-exp="${e.id}"
             style="--toy:${e.color}"
           >
@@ -239,12 +266,14 @@ function choose(){
             ${icon(e.kind)}
 
             <b>
-              ${state.language==='Arabic'?e.ar:e.title}
+              ${e.title}
             </b>
 
             <i class="select-pop">✓</i>
           </button>
-        `).join('')}
+        `,
+          )
+          .join("")}
       </div>
 
       <div class="actions">
@@ -258,14 +287,13 @@ function choose(){
   </main>`;
 }
 
-function personalize(){
-
-  const e=experiences.find(x=>x.id===state.experience);
+function personalize() {
+  const e = experiences.find((x) => x.id === state.experience);
 
   return `
   <main class="toy-world flow-world">
 
-    ${clouds('soft')}
+    ${clouds("soft")}
     ${topbar()}
 
     <section class="panel-wrap notebook-wrap">
@@ -275,7 +303,7 @@ function personalize(){
       <div class="notebook">
 
         <div class="rings">
-          ${'<i></i>'.repeat(7)}
+          ${"<i></i>".repeat(7)}
         </div>
 
         <div class="screen-title">
@@ -294,7 +322,7 @@ function personalize(){
               <small>THE STORY</small>
 
               <b>
-                ${state.language==='Arabic'?e.ar:e.title}
+                ${e.title}
               </b>
             </span>
 
@@ -305,8 +333,8 @@ function personalize(){
           </div>
 
           ${
-            state.experience==='other'
-            ? `
+            state.experience === "other"
+              ? `
               <label class="wide">
                 What’s the new experience?
 
@@ -318,7 +346,7 @@ function personalize(){
                 >
               </label>
             `
-            :''
+              : ""
           }
 
           <div class="field-grid">
@@ -340,11 +368,15 @@ function personalize(){
 
               <select name="age">
 
-                ${[4,5,6,7,8,9].map(n=>`
-                  <option ${state.age==n?'selected':''}>
+                ${[4, 5, 6, 7, 8, 9]
+                  .map(
+                    (n) => `
+                  <option ${state.age == n ? "selected" : ""}>
                     ${n}
                   </option>
-                `).join('')}
+                `,
+                  )
+                  .join("")}
 
               </select>
             </label>
@@ -375,36 +407,6 @@ function personalize(){
 
           </div>
 
-          <fieldset>
-
-            <legend>Story language</legend>
-
-            <label>
-              <input
-                type="radio"
-                name="language"
-                value="English"
-                ${state.language==='English'?'checked':''}
-              >
-
-              <span>ABC</span>
-              English
-            </label>
-
-            <label>
-              <input
-                type="radio"
-                name="language"
-                value="Arabic"
-                ${state.language==='Arabic'?'checked':''}
-              >
-
-              <span>أبج</span>
-              العربية
-            </label>
-
-          </fieldset>
-
           <div class="actions">
 
             <button
@@ -432,7 +434,7 @@ function personalize(){
   </main>`;
 }
 
-function loading(){
+function loading() {
   return `
   <main class="toy-world loading-world">
 
@@ -460,37 +462,26 @@ function loading(){
   </main>`;
 }
 
-function buildStory(){
+function buildStory() {
   return state.story;
 }
 
-function reader(){
+function reader() {
+  const s = buildStory();
 
-  const s=buildStory();
-
-  const e=experiences.find(
-    x=>x.id===state.experience
-  );
-
-  const rtl=state.language==='Arabic';
+  const e = experiences.find((x) => x.id === state.experience);
 
   return `
-  <main class="toy-world reader-world ${rtl?'rtl':''}">
+  <main class="toy-world reader-world">
 
-    ${clouds('calm')}
+    ${clouds("calm")}
     ${topbar()}
 
     <section class="reader-shell">
 
       <div class="reader-title">
 
-        <small>
-          ${
-            state.language==='Arabic'
-            ?'قصة صنعت خصيصاً لك'
-            :'A STORY MADE JUST FOR YOU'
-          }
-        </small>
+        <small>A STORY MADE JUST FOR YOU</small>
 
         <h1>${s.title}</h1>
 
@@ -504,7 +495,7 @@ function reader(){
 
           <span class="scene-sun"></span>
 
-          ${icon(e.kind,'story-toy')}
+          ${icon(e.kind, "story-toy")}
 
           <span class="hill h1"></span>
           <span class="hill h2"></span>
@@ -516,7 +507,7 @@ function reader(){
         <div class="text-page">
 
           <small>
-            PAGE ${state.page+1} / ${s.pages.length}
+            PAGE ${state.page + 1} / ${s.pages.length}
           </small>
 
           <p>
@@ -536,20 +527,24 @@ function reader(){
         <button
           id="prev"
           class="round-btn"
-          ${state.page===0?'disabled':''}
+          ${state.page === 0 ? "disabled" : ""}
         >
           ←
         </button>
 
         <div class="page-dots">
 
-          ${s.pages.map((_,i)=>`
+          ${s.pages
+            .map(
+              (_, i) => `
             <button
               data-page="${i}"
-              class="${i===state.page?'on':''}"
-              aria-label="Page ${i+1}"
+              class="${i === state.page ? "on" : ""}"
+              aria-label="Page ${i + 1}"
             ></button>
-          `).join('')}
+          `,
+            )
+            .join("")}
 
         </div>
 
@@ -559,19 +554,13 @@ function reader(){
         >
           ▶
 
-          <span>
-            ${
-              state.language==='Arabic'
-              ?'استمع'
-              :'Listen'
-            }
-          </span>
+          <span>Listen</span>
 
         </button>
 
         ${
-          state.page<s.pages.length-1
-          ?`
+          state.page < s.pages.length - 1
+            ? `
             <button
               id="next"
               class="round-btn"
@@ -579,7 +568,7 @@ function reader(){
               →
             </button>
           `
-          :`
+            : `
             <button
               data-go="1"
               class="yellow-btn small"
@@ -596,230 +585,177 @@ function reader(){
   </main>`;
 }
 
-function render(){
-
-  if('speechSynthesis' in window){
+function render() {
+  if ("speechSynthesis" in window) {
     speechSynthesis.cancel();
   }
 
-  app.className=
-    state.paused
-    ?'paused'
-    :'';
+  app.className = state.paused ? "paused" : "";
 
-  app.innerHTML=
-    state.loading
-    ?loading()
-    :state.step===1
-      ?landing()
-      :state.step===2
-        ?choose()
-        :state.step===3
-          ?personalize()
-          :reader();
+  app.innerHTML = state.loading
+    ? loading()
+    : state.step === 1
+      ? landing()
+      : state.step === 2
+        ? choose()
+        : state.step === 3
+          ? personalize()
+          : reader();
 
   bind();
 
   window.scrollTo({
-    top:0,
-    behavior:'smooth'
+    top: 0,
+    behavior: "smooth",
   });
 }
 
-function bind(){
+function bind() {
+  document.querySelectorAll("[data-go]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        state.step = +b.dataset.go;
+        state.page = 0;
 
-  document.querySelectorAll('[data-go]')
-    .forEach(b=>b.onclick=()=>{
+        if (state.step === 1) {
+          state.story = null;
+        }
 
-      state.step=+b.dataset.go;
-      state.page=0;
+        render();
+      }),
+  );
 
-      if(state.step===1){
-        state.story=null;
-      }
+  document.querySelectorAll("[data-exp]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        state.experience = b.dataset.exp;
 
-      render();
-    });
+        b.classList.add("react");
 
-  document.querySelectorAll('[data-exp]')
-    .forEach(b=>b.onclick=()=>{
+        setTimeout(render, 240);
+      }),
+  );
 
-      state.experience=b.dataset.exp;
+  document.querySelectorAll("[data-page]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        state.page = +b.dataset.page;
 
-      b.classList.add('react');
+        render();
+      }),
+  );
 
-      setTimeout(
-        render,
-        240
-      );
-    });
+  const m = document.querySelector("#motionToggle");
 
-  document.querySelectorAll('[data-page]')
-    .forEach(b=>b.onclick=()=>{
-
-      state.page=+b.dataset.page;
-
-      render();
-    });
-
-  const m=
-    document.querySelector('#motionToggle');
-
-  if(m){
-    m.onclick=()=>{
-
-      state.paused=!state.paused;
+  if (m) {
+    m.onclick = () => {
+      state.paused = !state.paused;
 
       render();
     };
   }
 
-  const l=
-    document.querySelector('#languageToggle');
+  const n = document.querySelector("#toPersonalize");
 
-  if(l){
-    l.onclick=()=>{
-
-      state.language=
-        state.language==='English'
-        ?'Arabic'
-        :'English';
+  if (n) {
+    n.onclick = () => {
+      state.step = 3;
 
       render();
     };
   }
 
-  const n=
-    document.querySelector('#toPersonalize');
+  const f = document.querySelector("#storyForm");
 
-  if(n){
-    n.onclick=()=>{
-
-      state.step=3;
-
-      render();
-    };
-  }
-
-  const f=
-    document.querySelector('#storyForm');
-
-  if(f){
-
-    f.onsubmit=async e=>{
-
+  if (f) {
+    f.onsubmit = async (e) => {
       e.preventDefault();
 
-      const d=new FormData(f);
+      const d = new FormData(f);
 
-      [
-        'name',
-        'age',
-        'concern',
-        'interest',
-        'language',
-        'customExperience'
-      ].forEach(
-        k=>state[k]=d.get(k)||''
+      ["name", "age", "concern", "interest", "customExperience"].forEach(
+        (k) => (state[k] = d.get(k) || ""),
       );
 
-      const selectedExperience=
-        experiences.find(
-          x=>x.id===state.experience
-        );
+      const selectedExperience = experiences.find(
+        (x) => x.id === state.experience,
+      );
 
-      const experience=
-        state.experience==='other'
-        ?state.customExperience
-        :state.language==='Arabic'
-          ?selectedExperience.ar
-          :selectedExperience.title;
+      const experience =
+        state.experience === "other"
+          ? state.customExperience
+          : selectedExperience.title;
 
-      state.loading=true;
+      state.loading = true;
 
       render();
 
-      try{
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
 
-        const response=
-          await fetch(
-            API_URL,
-            {
-              method:'POST',
+          headers: {
+            "Content-Type": "application/json",
+          },
 
-              headers:{
-                'Content-Type':'application/json'
-              },
+          body: JSON.stringify({
+            name: state.name,
+            age: Number(state.age),
+            experience: experience,
+            concern: state.concern,
+            interest: state.interest,
+          }),
+        });
 
-              body:JSON.stringify({
-                name:state.name,
-                age:Number(state.age),
-                experience:experience,
-                concern:state.concern,
-                interest:state.interest,
-                language:state.language
-              })
-            }
-          );
-
-        if(!response.ok){
-
-          const message=
-            await response.text();
+        if (!response.ok) {
+          const message = await response.text();
 
           throw new Error(
-            `Story generation failed (${response.status}): ${message}`
+            `Story generation failed (${response.status}): ${message}`,
           );
         }
 
-        const story=
-          await response.json();
+        const story = await response.json();
 
         console.log("API STORY:", story);
         console.log("TITLE:", story?.title);
         console.log("PAGES:", story?.pages);
 
-        if(
+        if (
           !story ||
-          typeof story.title!=='string' ||
+          typeof story.title !== "string" ||
           !Array.isArray(story.pages) ||
-          story.pages.length===0
-        ){
-          throw new Error(
-            'The backend returned an invalid story format.'
-          );
+          story.pages.length === 0
+        ) {
+          throw new Error("The backend returned an invalid story format.");
         }
 
-        state.story=story;
+        state.story = story;
 
-        state.loading=false;
-        state.step=4;
-        state.page=0;
+        state.loading = false;
+        state.step = 4;
+        state.page = 0;
 
         render();
-
-      }catch(error){
-
+      } catch (error) {
         console.error(error);
 
-        state.loading=false;
-        state.step=3;
+        state.loading = false;
+        state.step = 3;
 
         render();
 
         alert(
-          'Could not generate the story. Make sure the backend is running, then try again.'
+          "Could not generate the story. Make sure the backend is running, then try again.",
         );
       }
     };
   }
 
-  const p=
-    document.querySelector('#prev');
+  const p = document.querySelector("#prev");
 
-  if(p){
-    p.onclick=()=>{
-
+  if (p) {
+    p.onclick = () => {
       speechSynthesis.cancel();
 
       state.page--;
@@ -828,12 +764,10 @@ function bind(){
     };
   }
 
-  const nx=
-    document.querySelector('#next');
+  const nx = document.querySelector("#next");
 
-  if(nx){
-    nx.onclick=()=>{
-
+  if (nx) {
+    nx.onclick = () => {
       speechSynthesis.cancel();
 
       state.page++;
@@ -842,38 +776,27 @@ function bind(){
     };
   }
 
-  const snd=
-    document.querySelector('#soundBtn');
+  const snd = document.querySelector("#soundBtn");
 
-  if(snd){
-
-    snd.onclick=()=>{
-
+  if (snd) {
+    snd.onclick = () => {
       speechSynthesis.cancel();
 
-      const story=buildStory();
+      const story = buildStory();
 
-      if(!story){
+      if (!story) {
         return;
       }
 
-      const u=
-        new SpeechSynthesisUtterance(
-          story.pages[state.page]
-        );
+      const u = new SpeechSynthesisUtterance(story.pages[state.page]);
 
-      u.lang=
-        state.language==='Arabic'
-        ?'ar-SA'
-        :'en-US';
+      u.lang = "en-US";
 
       speechSynthesis.speak(u);
 
-      snd.classList.add('playing');
+      snd.classList.add("playing");
 
-      u.onend=
-      u.onerror=
-        ()=>snd.classList.remove('playing');
+      u.onend = u.onerror = () => snd.classList.remove("playing");
     };
   }
 }
