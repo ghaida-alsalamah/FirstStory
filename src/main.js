@@ -43,6 +43,46 @@ const state = {
 
 const API_URL = "/api/generate";
 
+const NARRATOR_VOICE = {
+  provider: "gemini",
+  model: "gemini-2.5-flash-preview-tts",
+  voice: "Fenrir",
+  instructions:
+    "Narrate like a gentle old cinematic fairytale storyteller from a classic bedtime storybook film — slow pace, warm and reassuring tone, soft dramatic pauses before key moments, never ominous or frightening.",
+};
+
+let currentNarration = null;
+
+function stopNarration() {
+  if (currentNarration) {
+    currentNarration.pause();
+    currentNarration.currentTime = 0;
+    currentNarration = null;
+  }
+}
+
+async function narrate(text, btn) {
+  stopNarration();
+
+  if (btn) btn.classList.add("playing");
+
+  try {
+    const audio = await puter.ai.txt2speech(text, NARRATOR_VOICE);
+
+    currentNarration = audio;
+
+    audio.onended = audio.onerror = () => {
+      if (btn) btn.classList.remove("playing");
+      if (currentNarration === audio) currentNarration = null;
+    };
+
+    await audio.play();
+  } catch (error) {
+    console.error("Narration failed:", error);
+    if (btn) btn.classList.remove("playing");
+  }
+}
+
 const app = document.querySelector("#app");
 
 const esc = (v = "") =>
@@ -586,9 +626,7 @@ function reader() {
 }
 
 function render() {
-  if ("speechSynthesis" in window) {
-    speechSynthesis.cancel();
-  }
+  stopNarration();
 
   app.className = state.paused ? "paused" : "";
 
@@ -737,6 +775,8 @@ function bind() {
         state.page = 0;
 
         render();
+
+        narrate(story.pages[0], document.querySelector("#soundBtn"));
       } catch (error) {
         console.error(error);
 
@@ -756,8 +796,6 @@ function bind() {
 
   if (p) {
     p.onclick = () => {
-      speechSynthesis.cancel();
-
       state.page--;
 
       render();
@@ -768,8 +806,6 @@ function bind() {
 
   if (nx) {
     nx.onclick = () => {
-      speechSynthesis.cancel();
-
       state.page++;
 
       render();
@@ -780,23 +816,13 @@ function bind() {
 
   if (snd) {
     snd.onclick = () => {
-      speechSynthesis.cancel();
-
       const story = buildStory();
 
       if (!story) {
         return;
       }
 
-      const u = new SpeechSynthesisUtterance(story.pages[state.page]);
-
-      u.lang = "en-US";
-
-      speechSynthesis.speak(u);
-
-      snd.classList.add("playing");
-
-      u.onend = u.onerror = () => snd.classList.remove("playing");
+      narrate(story.pages[state.page], snd);
     };
   }
 }
