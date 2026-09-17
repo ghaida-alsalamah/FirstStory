@@ -497,6 +497,8 @@ function loading() {
         <i></i>
       </div>
 
+      <p class="ai-note">Stories are written by AI, just for your little one.</p>
+
     </section>
 
   </main>`;
