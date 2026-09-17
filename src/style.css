@@ -363,17 +363,26 @@ button {
   background: var(--cream);
   border: 3px solid var(--deep);
 }
-.storybook-house:before {
+.storybook-house:before,
+.storybook-house:after {
   content: "";
   position: absolute;
-  width: 34px;
-  height: 34px;
+  width: 0;
+  height: 0;
+}
+.storybook-house:before {
+  top: -20px;
+  left: -3px;
+  border-left: 23px solid transparent;
+  border-right: 23px solid transparent;
+  border-bottom: 20px solid var(--deep);
+}
+.storybook-house:after {
+  top: -17px;
   left: 0;
-  top: -21px;
-  background: var(--red);
-  border: 3px solid var(--deep);
-  transform: rotate(45deg);
-  z-index: -1;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom: 17px solid var(--red);
 }
 .storybook-house b {
   position: absolute;
@@ -892,6 +901,7 @@ select:focus {
   top: auto;
   transform: none;
   margin: auto;
+  color: var(--deep);
 }
 .loading-box h1 {
   text-shadow: 3px 3px 0 var(--deep);
@@ -901,6 +911,13 @@ select:focus {
 .loading-box p {
   font-size: 18px;
   font-weight: 700;
+}
+.ai-note {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: white;
+  opacity: 0.8;
+  margin-top: 16px !important;
 }
 .loading-dots i {
   display: inline-block;
