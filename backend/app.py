@@ -32,7 +32,7 @@ class StoryRequest(BaseModel):
     experience: str
     concern: str = ""
     interest: str = ""
-
+    language: str
 
 def _decode_json_strings(text: str) -> list[str]:
     """Decode every JSON string literal in a model-generated text fragment."""
@@ -106,12 +106,13 @@ def parse_story_reply(raw_reply: str) -> dict:
 def generate_story(data: StoryRequest):
 
     user_prompt = prompts.build_story_prompt(
-        name=data.name,
-        age=data.age,
-        experience=data.experience,
-        concern=data.concern,
-        interest=data.interest
-    )
+    name=data.name,
+    age=data.age,
+    experience=data.experience,
+    concern=data.concern,
+    interest=data.interest,
+    language=data.language
+)
 
     result = llm.generate(user_prompt)
 
