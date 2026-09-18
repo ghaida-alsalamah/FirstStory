@@ -35,6 +35,7 @@ const state = {
   age: "6",
   concern: "",
   interest: "",
+  language: "English",
   page: 0,
   paused: false,
   loading: false,
@@ -444,6 +445,19 @@ function personalize() {
                 placeholder="Space and planets"
               >
             </label>
+            <label>
+              Story language <em>*</em>
+
+              <select name="language">
+              <option value="English" ${state.language === "English" ? "selected" : ""}>
+               English
+              </option>
+              <option value="Arabic" ${state.language === "Arabic" ? "selected" : ""}>
+               العربية
+              </option>
+              </select>
+              </label>
+            
 
           </div>
 
@@ -713,9 +727,9 @@ function bind() {
 
       const d = new FormData(f);
 
-      ["name", "age", "concern", "interest", "customExperience"].forEach(
-        (k) => (state[k] = d.get(k) || ""),
-      );
+     ["name", "age", "concern", "interest", "customExperience", "language"].forEach(
+    (k) => (state[k] = d.get(k) || ""),
+     ); 
 
       const selectedExperience = experiences.find(
         (x) => x.id === state.experience,
@@ -744,6 +758,7 @@ function bind() {
             experience: experience,
             concern: state.concern,
             interest: state.interest,
+            language: state.language,
           }),
         });
 
